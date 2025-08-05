@@ -15,18 +15,17 @@ jobs:
         config:
           - { 
               tag: "22.03.5",
-              target: "x86",
-              subtarget: "64",
-              pkgarch: "x86_64",
-              vermagic: "a9d0f1e3",
-              sdk_url: "https://downloads.openwrt.org/releases/22.03.5/targets/x86/64/openwrt-sdk-22.03.5-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz"
+              target: "ramips",
+              subtarget: "mt7621",
+              pkgarch: "mipsel_24kc",
+              vermagic: "218bf6e00a546ab5c6ea465b29f9c777"              
             }
           # Добавьте другие архитектуры по необходимости
           # - { 
-          #     tag: "22.03.5",
-          #     target: "bcm27xx",
-          #     subtarget: "bcm2711",
-          #     pkgarch: "aarch64_cortex-a72",
+          #     tag: "22.03.0",
+          #     target: "ramips",
+          #     subtarget: "mt7621",
+          #     pkgarch: "mipsel_24kc",
           #     vermagic: "b2f3c8d9",
           #     sdk_url: "https://downloads.openwrt.org/releases/22.03.5/targets/bcm27xx/bcm2711/openwrt-sdk-22.03.5-bcm27xx-bcm2711_gcc-11.2.0_musl.Linux-x86_64.tar.xz"
           #   }
