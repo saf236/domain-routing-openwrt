@@ -1,0 +1,48 @@
+name: Build OpenWrt Module
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  # Настройки сборки (измените под вашу версию OpenWRT и устройство)
+  build_env:
+    tag: "22.03.5"             # Версия OpenWRT
+    pkgarch: "x86_64"          # Архитектура пакета
+    target: "x86"              # Платформа (x86, ramips, bcm53xx)
+    subtarget: "64"            # Подплатформа (64, generic, и т.д.)
+    vermagic: "a9d0f1e3"       # Версионная контрольная сумма ядра (уточните для вашего target)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download OpenWrt SDK
+        run: |
+          SDK_URL="https://downloads.openwrt.org/releases/${{ env.build_env.tag }}/targets/${{ env.build_env.target }}/${{ env.build_env.subtarget }}/openwrt-sdk-${{ env.build_env.tag }}-${{ env.build_env.target }}-${{ env.build_env.subtarget }}_gcc-11.2.0_musl.Linux-x86_64.tar.xz"
+          wget $SDK_URL -O sdk.tar.xz
+          tar -xf sdk.tar.xz
+          mv openwrt-sdk-* sdk
+
+      - name: Set up vermagic
+        run: |
+          echo "VERMAGIC=${{ env.build_env.vermagic }}" >> $GITHUB_ENV
+          sed -i "s/VERMAGIC:=.*/VERMAGIC:=${{ env.build_env.vermagic }}/" sdk/include/kernel-version.mk
+
+      - name: Build package
+        run: |
+          cd sdk
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          cp -r ../package ./feeds/packages/net/domain-routing
+          make package/domain-routing/compile V=sc PKG_ARCH=${{ env.build_env.pkgarch }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages-${{ env.build_env.target }}-${{ env.build_env.subtarget }}
+          path: sdk/bin/packages/*/base/*.ipk
